@@ -1,0 +1,25 @@
+name: Run Ansible Playbooks
+
+on:
+  push:
+    branches:
+      - ansible
+
+jobs:
+  run-playbooks:
+    runs-on: self-hosted
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Run ansible-lint
+      run: ansible-lint -v DemoFiles/AnsibleGHA/*.yml
+    - name: Run Ansible Playbook to create Pure hosts & volumes
+      run: ansible-playbook --verbose DemoFiles/AnsibleGHA/ansible_gha.yaml
+      env:
+        ARRAY_URL: ${{ secrets.ARRAY_URL_SECRET }}
+        API_TOKEN: ${{ secrets.API_TOKEN_SECRET }}
+        DATASTORE_COUNT: ${{ secrets.DATASTORE_COUNT_SECRET }}
+        DATASTORE_SIZE: ${{ secrets.DATASTORE_SIZE_SECRET }}

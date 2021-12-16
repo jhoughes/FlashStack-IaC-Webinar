@@ -1,0 +1,43 @@
+- name: Configure Pure Storage Environment
+  hosts: localhost
+  collections:
+  - purestorage.flasharray
+  gather_facts: yes
+  vars:
+    fa_url: flasharray1.testdrive.local
+    fa_api_token: d42e22c0-4a11-225a-ef34-76de429b3caa
+  tasks:
+  - name: Create Volumes
+    purefa_volume:
+      name: ansible-demo-volume
+      size: 10G
+      fa_url: "{{fa_url}}"
+      api_token: "{{fa_api_token}}"
+  - name: Create Host1
+    purefa_host:
+      host: "ansible-demo-host1"
+      protocol: iscsi
+      iqn: "iqn.1998-01.com.vmware:ansible-demo-host1"
+      fa_url: "{{fa_url}}"
+      api_token: "{{fa_api_token}}"
+  - name: Create Host2
+    purefa_host:
+      host: "ansible-demo-host2"
+      protocol: iscsi
+      iqn: "iqn.1998-01.com.vmware:ansible-demo-host2"
+      fa_url: "{{fa_url}}"
+      api_token: "{{fa_api_token}}"
+  - name: Create Hostgroup
+    purefa_hg:
+      hostgroup: ansible-demo-hostgroup
+      fa_url: "{{fa_url}}"
+      api_token: "{{fa_api_token}}"
+  - name: Add hosts to hostgroup, connect volume
+    purefa_hg:
+      hostgroup: ansible-demo-hostgroup
+      host:
+        - "ansible-demo-host1"
+        - "ansible-demo-host2"
+      volume: "ansible-demo-volume"
+      fa_url: "{{fa_url}}"
+      api_token: "{{fa_api_token}}"

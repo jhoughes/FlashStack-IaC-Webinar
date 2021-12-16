@@ -1,0 +1,11 @@
+purestorage_target =  "flasharray1.testdrive.local"
+purestorage_apitoken = ""
+vol_name = "terraform-esxi-volume"
+vol_size = "42949672960"
+vol_lun_id = "225"
+host1_name = "terraform-esxi-01"
+host1_iqn = "iqn.1998-01.com.vmware:terraform-esxi-01"
+host2_name = "terraform-esxi-02"
+host2_iqn = "iqn.1998-01.com.vmware:terraform-esxi-02"
+hostgroup_name = "terraform-hostgroup"
+
