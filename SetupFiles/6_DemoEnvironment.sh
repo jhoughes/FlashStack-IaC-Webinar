@@ -4,7 +4,9 @@
 #Upgrade Pip, install virtualenv, add to path
 GREEN='\033[1;32m'
 NC='\033[0m'
-echo -e "${GREEN}Updating Pip, installing virtualenv${NC}"
+echo -e "${GREEN}Installing & updating Pip, installing virtualenv${NC}"
+curl https://bootstrap.pypa.io/get-pip.py
+python get-pip.py
 python3 -m pip install --upgrade pip
 python3 -m pip install virtualenv
 PATH=$HOME/.local/bin:$PATH

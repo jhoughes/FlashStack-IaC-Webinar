@@ -19,12 +19,8 @@ sudo apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.rel
 sudo apt install terraform -y
 echo -e "${GREEN}Terraform version is $(terraform --version)${NC}"
 
-#Install Pip
-echo -e "${GREEN}Installing Pip${NC}"
-sudo DEBIAN_FRONTEND=noninteractive apt-get install python3-pip -y
-
 #Install Ansible - globally
-echo -e "${GREEN}Installing Pip${NC}"
+echo -e "${GREEN}Installing Ansible${NC}"
 sudo apt install software-properties-common -y
 sudo apt-add-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible ansible-lint -y

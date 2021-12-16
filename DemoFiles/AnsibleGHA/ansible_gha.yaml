@@ -1,0 +1,93 @@
+---
+- name: Pure Storage demo run from GitHub Actions
+  hosts: localhost
+  collections:
+  - purestorage.flasharray
+  gather_facts: yes
+  vars:
+    esx_cluster: AnsibleESX
+    esx_hosts:
+      ghaesxi1:
+        iqn: iqn.1998-01.com.vmware:ghaesxi1
+        protocol: iscsi
+      ghaesxi2:
+        iqn: iqn.1998-01.com.vmware:ghaesxi2
+        protocol: iscsi
+      ghaesxi3:
+        iqn: iqn.1998-01.com.vmware:ghaesxi3
+        protocol: iscsi
+      ghaesxi4:
+        wwns:
+          - 00:00:00:00:00:00:00:01
+          - 00:00:00:00:00:00:00:02
+        protocol: fc
+      ghaesxi5:
+        wwns:
+          - 00:00:00:00:00:00:00:03
+          - 00:00:00:00:00:00:00:04
+        protocol: fc
+    datastore_count: "{{ lookup('env', 'DATASTORE_COUNT') }}"
+    datastore_size: "{{ lookup('env', 'DATASTORE_SIZE') }}"
+    bfs_size: 18G
+    fa_url: "{{ lookup('env', 'ARRAY_URL') }}"
+    fa_api_token: "{{ lookup('env', 'API_TOKEN') }}"
+
+  tasks:
+  - name: Install purestorage python module
+    pip:
+      name:
+      - purestorage
+      - py-pure-client
+
+  - name: Create datastore volume
+    purefa_volume:
+      name: gha_datastore_{{ item }}
+      size: "{{ datastore_size }}"
+      fa_url: "{{fa_url}}"
+      api_token: "{{fa_api_token}}"
+    loop: "{{ range(0, datastore_count)|list }}"
+
+  - name: Create BFS volume
+    purefa_volume:
+      name: gha_bfs_{{ item.key }}
+      size: "{{ bfs_size }}"
+      fa_url: "{{fa_url}}"
+      api_token: "{{fa_api_token}}"
+    loop: "{{ esx_hosts | dict2items }}"
+
+  - name: Create new hostgroup
+    purefa_hg:
+      hostgroup: "{{ esx_cluster }}"
+      fa_url: "{{fa_url}}"
+      api_token: "{{fa_api_token}}"
+
+  - name: Create host
+    purefa_host:
+      name: "{{ item.key }}"
+      protocol: "{{ item.value.protocol }}"
+      personality: esxi
+      iqn: "{{ item.value.iqn | default('') }}"
+      wwns: "{{ item.value.wwns | default('') }}"
+      volume: gha_bfs_{{ item.key }}
+      fa_url: "{{fa_url}}"
+      api_token: "{{fa_api_token}}"
+    loop: "{{ esx_hosts | dict2items }}"
+
+  - name: Add datastore volume to hostgroup
+    purefa_hg:
+      hostgroup: AnsibleESX
+      volume:
+        - gha_datastore_{{ item }}
+      fa_url: "{{fa_url}}"
+      api_token: "{{fa_api_token}}"
+    loop: "{{ range(0, datastore_count)|list }}"
+
+  - name: Add hosts to hostgroup
+    purefa_hg:
+      hostgroup: AnsibleESX
+      host:
+        - "{{ item.key }}"
+      fa_url: "{{fa_url}}"
+      api_token: "{{fa_api_token}}"
+    loop: "{{ esx_hosts | dict2items }}"
+
