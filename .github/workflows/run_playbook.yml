@@ -21,5 +21,4 @@ jobs:
       env:
         ARRAY_URL: ${{ secrets.ARRAY_URL_SECRET }}
         API_TOKEN: ${{ secrets.API_TOKEN_SECRET }}
-        DATASTORE_COUNT: ${{ secrets.DATASTORE_COUNT_SECRET }}
         DATASTORE_SIZE: ${{ secrets.DATASTORE_SIZE_SECRET }}
